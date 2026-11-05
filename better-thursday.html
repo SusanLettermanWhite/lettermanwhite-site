@@ -375,18 +375,20 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
       let tx, ty;
       if (p.loc === "in") {
         if (out) { tx = DOOR.cx; ty = 0.82; }
-        else { tx = lerp(HOMES[p.i][0], 0.12 + HOMES[p.i][0] * 0.42, cur.huddle); ty = HOMES[p.i][1]; }
+        else { tx = lerp(HOMES[p.i][0], 0.12 + HOMES[p.i][0] * 0.42, SCENES[scene].huddle); ty = HOMES[p.i][1]; }
       } else {
         if (out) { tx = SPOTS[p.i][0]; ty = outFeetRow(SPOTS[p.i][1]); } else { tx = DOOR.cx; ty = outFeetRow(0); }
       }
       const dx = tx - p.x, dy = ty - p.y, d = Math.hypot(dx, dy);
-      if (d > 0.004) {
+      if (d > 0.012 || (p.moving && d > 0.003)) {
+        p.moving = true;
         const st = Math.min(d, speed * dt);
         p.x += dx / d * st; p.y += dy / d * st;
         p.walk = Math.min(1, p.walk + dt * 4);
         if (Math.abs(dx) > 0.002) p.face = Math.sign(dx);
         p.phase += dt * 7 * (reduce ? 0.5 : 1);
       } else {
+        p.moving = false;
         p.walk = Math.max(0, p.walk - dt * 4);
         // Through the door, in either direction.
         if (p.loc === "in" && out) { p.loc = "out"; p.x = DOOR.cx; p.y = outFeetRow(0); }
