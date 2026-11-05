@@ -55,6 +55,9 @@ p:last-child { margin-bottom: 0; }
 .fieldnote .tag { display: block; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--violet); margin-bottom: 0.35rem; }
 .land { font-family: var(--display); font-size: 1.7rem; line-height: 1.25; margin-top: 1.5rem; }
 .ick .land { color: var(--rust); }
+.coda { font-family: var(--display); font-size: 1.45rem; line-height: 1.3; margin: 1.75rem 0 0; }
+.coda + .coda { margin-top: 0.4rem; }
+.coda.last { color: var(--amber); font-style: italic; }
 .warm .land { color: var(--amber); }
 .calm .land { color: var(--violet); }
 
@@ -110,7 +113,7 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
 </button>
 
 <main>
-  <section class="chapter hero" data-scene="phone">
+  <section class="chapter hero" data-scene="five">
     <div class="card">
       <p class="eyebrow">Readiness for Change</p>
       <h1>A Better <em>Thursday</em></h1>
@@ -147,7 +150,7 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
     </div>
   </section>
 
-  <section class="chapter" data-scene="door">
+  <section class="chapter" data-scene="huddle">
     <div class="card">
       <p class="eyebrow"><span class="num">3</span>The step that gets skipped</p>
       <h2>Change starts when the present feels <em>wrong</em>.</h2>
@@ -240,6 +243,8 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
       <p>Change does not start with the future. It starts with how the present feels. Then it needs people who go first, a story worth moving toward, and the time and skill to follow.</p>
       <p>Most organizational change efforts begin with the announcement. This team began to move when Thursday became an uncomfortable reminder that some colleagues were finishing their reports and leaving work earlier, and those left behind wanted to be included. It kept moving because people could picture a better one.</p>
       <p class="land">What had been familiar no longer felt comfortable. The change that had felt risky now felt valuable and worth their time.</p>
+      <p class="coda">On a Thursday in June, twelve people went home at five.</p>
+      <p class="coda last">The next week, the team down the hall noticed.</p>
     </div>
   </section>
 </main>
@@ -259,19 +264,24 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
   // out: how many of the twelve have gone outside. look: 1 face the door, -1 turn away, 0 natural.
   // slump: posture of those left inside. lean: leaning toward the door. map: the informal network.
   // reveal: the wall falls away and we stand outside with everyone.
+  // fix: clock frozen at five. adopt: how many glow gold while still inside. devices: the new tool in their hands.
+  // huddle: the team pulls together, away from the door. cozy: lamplight comfort. next: the door down the hall.
   const SCENES = {
-    room:   { door: 0,    ick: 0,   color: 0.12, out: 0,  look: 0,  slump: 0,   lean: 0, map: 0, reveal: 0 },
-    door:   { door: 0.35, ick: 0,   color: 0.25, out: 0,  look: -1, slump: 0,   lean: 0, map: 0, reveal: 0 },
-    phone:  { door: 0.65, ick: 0.2, color: 0.45, out: 2,  look: 1,  slump: 0,   lean: 0, map: 0, reveal: 0 },
-    gap:    { door: 0.65, ick: 1,   color: 0.6,  out: 2,  look: 1,  slump: 1,   lean: 0, map: 0, reveal: 0 },
-    gap2:   { door: 0.75, ick: 0.8, color: 0.7,  out: 4,  look: 1,  slump: 0.6, lean: 0, map: 0, reveal: 0 },
-    map:    { door: 0.75, ick: 0.3, color: 0.7,  out: 4,  look: 0,  slump: 0.2, lean: 0, map: 1, reveal: 0 },
-    pull:   { door: 1,    ick: 0,   color: 1,    out: 4,  look: 1,  slump: 0,   lean: 1, map: 0, reveal: 0 },
-    path:   { door: 1,    ick: 0,   color: 1,    out: 12, look: 1,  slump: 0,   lean: 0, map: 0, reveal: 0 },
-    gather: { door: 1,    ick: 0,   color: 1,    out: 12, look: 0,  slump: 0,   lean: 0, map: 0, reveal: 1 }
+    five:   { door: 0.7,  ick: 0.35, color: 0.45, out: 0,  adopt: 2,  look: 2,  slump: 0.3, lean: 0, map: 0, reveal: 0, fix: 1, devices: 0, huddle: 0, cozy: 0,   next: 0, notice: 0 },
+    room:   { door: 0,    ick: 0,    color: 0.12, out: 0,  adopt: 0,  look: 0,  slump: 0,   lean: 0, map: 0, reveal: 0, fix: 0, devices: 0, huddle: 0, cozy: 0.4, next: 0, notice: 0 },
+    door:   { door: 0.35, ick: 0,    color: 0.25, out: 0,  adopt: 0,  look: -1, slump: 0,   lean: 0, map: 0, reveal: 0, fix: 0, devices: 0, huddle: 0, cozy: 0.2, next: 0, notice: 1 },
+    huddle: { door: 0.08, ick: 0,    color: 0.15, out: 0,  adopt: 0,  look: -1, slump: 0,   lean: 0, map: 0, reveal: 0, fix: 0, devices: 0, huddle: 1, cozy: 1,   next: 0, notice: 0 },
+    phone:  { door: 0.3,  ick: 0.15, color: 0.35, out: 0,  adopt: 2,  look: 3,  slump: 0,   lean: 0.4, map: 0, reveal: 0, fix: 0, devices: 1, huddle: 0, cozy: 0, next: 0, notice: 0 },
+    gap:    { door: 0.65, ick: 1,    color: 0.6,  out: 2,  adopt: 2,  look: 1,  slump: 1,   lean: 0, map: 0, reveal: 0, fix: 0, devices: 0, huddle: 0, cozy: 0,   next: 0, notice: 0 },
+    gap2:   { door: 0.75, ick: 0.8,  color: 0.7,  out: 4,  adopt: 4,  look: 1,  slump: 0.6, lean: 0, map: 0, reveal: 0, fix: 0, devices: 0, huddle: 0, cozy: 0,   next: 0, notice: 0 },
+    map:    { door: 0.75, ick: 0.3,  color: 0.7,  out: 4,  adopt: 4,  look: 0,  slump: 0.2, lean: 0, map: 1, reveal: 0, fix: 0, devices: 0, huddle: 0, cozy: 0,   next: 0, notice: 0 },
+    pull:   { door: 1,    ick: 0,    color: 1,    out: 4,  adopt: 4,  look: 1,  slump: 0,   lean: 1, map: 0, reveal: 0, fix: 0, devices: 0, huddle: 0, cozy: 0,   next: 0, notice: 0 },
+    path:   { door: 1,    ick: 0,    color: 1,    out: 12, adopt: 12, look: 1,  slump: 0,   lean: 0, map: 0, reveal: 0, fix: 0, devices: 0, huddle: 0, cozy: 0,   next: 0, notice: 0 },
+    gather: { door: 1,    ick: 0,    color: 1,    out: 12, adopt: 12, look: 0,  slump: 0,   lean: 0, map: 0, reveal: 1, fix: 0, devices: 0, huddle: 0, cozy: 0,   next: 1, notice: 0 }
   };
-  let scene = "room", lastScene = "room", sceneTime = 0;
-  const cur = Object.assign({}, SCENES.room);
+
+  let scene = "five", lastScene = "five", sceneTime = 0;
+  const cur = Object.assign({}, SCENES.five);
 
   /* ================= Stage ================= */
   const cv = document.getElementById("field");
@@ -317,6 +327,7 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
 
   function wantsOut(p) {
     const T = SCENES[scene].out;
+    if (scene === "five" && p.rank < 2) return sceneTime > 0.6;
     if (p.rank >= T) return false;
     if (scene === "path" && p.rank >= 4) return sceneTime > (p.rank - 4) * 0.9;
     return true;
@@ -326,9 +337,22 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
   const outsideScale = (y) => lerp(0.42, 0.62 + Math.max(0, (y - 0.86) / 0.07) * 0.1, cur.reveal);
 
   let clock = 0, hand = -Math.PI / 2;
+  function cutTo(name) {
+    Object.assign(cur, SCENES[name]);
+    for (const p of people) {
+      p.loc = "in"; p.walk = 0;
+      if (name === "five" && p.rank < 2) { p.x = 0.6 + p.rank * 0.05; p.y = 0.86; }
+      else { p.x = HOMES[p.i][0]; p.y = HOMES[p.i][1]; }
+      p.gold = p.rank < SCENES[name].adopt ? 1 : 0;
+    }
+  }
   function step(dt) {
     clock += dt; sceneTime += dt;
-    if (scene !== lastScene) { lastScene = scene; sceneTime = 0; }
+    if (scene !== lastScene) {
+      // The opening is a flash-forward. Moving into or out of it is a cut, not a walk.
+      if (scene === "five" || lastScene === "five") cutTo(scene);
+      lastScene = scene; sceneTime = 0;
+    }
     const k = Math.min(1, dt * 1.1);
     const tgt = SCENES[scene];
     for (const key in tgt) cur[key] += (tgt[key] - cur[key]) * k;
@@ -338,10 +362,11 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
 
     for (const p of people) {
       const out = wantsOut(p);
-      p.gold += ((out ? 1 : 0) - p.gold) * Math.min(1, dt * 1.5);
+      p.gold += ((out || p.rank < SCENES[scene].adopt ? 1 : 0) - p.gold) * Math.min(1, dt * 1.5);
       let tx, ty;
       if (p.loc === "in") {
-        if (out) { tx = DOOR.cx; ty = 0.82; } else { tx = HOMES[p.i][0]; ty = HOMES[p.i][1]; }
+        if (out) { tx = DOOR.cx; ty = 0.82; }
+        else { tx = lerp(HOMES[p.i][0], 0.12 + HOMES[p.i][0] * 0.42, cur.huddle); ty = HOMES[p.i][1]; }
       } else {
         if (out) { tx = SPOTS[p.i][0]; ty = outFeetRow(SPOTS[p.i][1]); } else { tx = DOOR.cx; ty = outFeetRow(0); }
       }
@@ -359,7 +384,11 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
         else if (p.loc === "out" && !out) { p.loc = "in"; p.x = DOOR.cx; p.y = 0.82; }
         else if (p.loc === "in") {
           const look = SCENES[scene].look;
-          p.face = look === 1 ? Math.sign(DOOR.cx - p.x) || 1 : look === -1 ? -(Math.sign(DOOR.cx - p.x) || 1) : p.idleFace;
+          const goldX = people.filter((q) => q.rank < 2).reduce((a, q) => a + q.x, 0) / 2;
+          if (look === 2 && p.rank < 2) { p.face = 1; continue; }
+          const doorX = look === 2 ? goldX : DOOR.cx;
+          if (look === 3) p.face = p.rank < 2 ? (p.rank === 0 ? 1 : -1) : (Math.sign(goldX - p.x) || 1);
+          else p.face = (look === 1 || look === 2) ? Math.sign(doorX - p.x) || 1 : look === -1 ? -(Math.sign(DOOR.cx - p.x) || 1) : p.idleFace;
         } else {
           p.face = p.idleFace;
         }
@@ -405,7 +434,7 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
     return { x: hx, y: hy };
   }
 
-  function drawDial(x, y, r, col, a, lw, ang) {
+  function drawDial(x, y, r, col, a, lw, ang, hourAng) {
     ctx.strokeStyle = rgba(col, a); ctx.lineWidth = lw; ctx.lineCap = "round";
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke();
     for (let k = 0; k < 12; k++) {
@@ -414,7 +443,7 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
     }
     ctx.lineWidth = lw + 0.5;
     ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(ang) * r * 0.75, y + Math.sin(ang) * r * 0.75); ctx.stroke();
-    const ah = ang / 12 - Math.PI / 3;
+    const ah = hourAng !== undefined ? hourAng : ang / 12 - Math.PI / 3;
     ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(ah) * r * 0.48, y + Math.sin(ah) * r * 0.48); ctx.stroke();
   }
 
@@ -457,6 +486,19 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
       ctx.fillStyle = rgba(fl.c, 0.9 * c);
       ctx.beginPath(); ctx.arc(sx(fl.x), sy(fy), r, 0, Math.PI * 2); ctx.fill();
     }
+    // Down the hall: another door, and someone looking out
+    if (cur.next > 0.02) {
+      const bx0 = 0.82, bx1 = 0.99, by0 = horizon - 0.2, by1 = horizon + 0.05;
+      ctx.fillStyle = rgba([58, 56, 84], 0.95 * cur.next);
+      ctx.fillRect(sx(bx0), sy(by0), (bx1 - bx0) * S.w, (by1 - by0) * S.h);
+      const dOpen = Math.min(1, Math.max(0, (sceneTime - 3) / 3)) * cur.next;
+      const dx0 = 0.88, dx1 = 0.93, dy0 = by1 - 0.12;
+      ctx.fillStyle = rgba([255, 226, 170], 0.85 * dOpen);
+      ctx.fillRect(sx(dx0), sy(dy0), (dx1 - dx0) * S.w * dOpen, (by1 - dy0) * S.h);
+      ctx.fillStyle = rgba([40, 38, 62], 0.95 * cur.next);
+      ctx.fillRect(sx(dx0 + (dx1 - dx0) * dOpen), sy(dy0), (dx1 - dx0) * (1 - dOpen) * S.w, (by1 - dy0) * S.h);
+      if (dOpen > 0.5) drawFigure(sx(dx0 + 0.012), sy(by1), S.h * 0.085, { walk: 0, phase: 0, face: -1, slump: 0, lean: 0.6, color: LAV, alpha: (dOpen - 0.5) * 2 * 0.9, seed: 3 });
+    }
     // Other people, already out here
     for (const s of STRANGERS) {
       const feet = lerp(0.78, 0.86 + s.row * 0.07, rv), sc = outsideScale(feet);
@@ -472,10 +514,20 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
     const lean = outside ? 0 : cur.lean * (1 - p.gold);
     const happy = outside && p.walk < 0.2 ? Math.abs(Math.sin(clock * 2.4 + p.seed)) * 1.5 : 0;
     const fidget = outside ? 0 : cur.ick * Math.sin(clock * 3 + p.seed * 3) * 0.6;
-    return drawFigure(sx(p.x) + fidget, sy(p.y), 0.22 * S.h * sc, {
+    const fh = 0.22 * S.h * sc;
+    const head = drawFigure(sx(p.x) + fidget, sy(p.y), fh, {
       walk: p.walk, phase: p.phase, face: p.face, slump, lean, color: base, alpha: 0.95, seed: p.seed,
       bounce: happy, raise: outside && cur.reveal > 0.5 ? 0.15 : 0
     });
+    if (!outside && cur.devices > 0.02 && p.rank < 2) {
+      const dx = head.x + p.face * fh * 0.16, dy = head.y + fh * 0.3;
+      const g = ctx.createRadialGradient(dx, dy, 0, dx, dy, fh * 0.3);
+      g.addColorStop(0, rgba(AMBER, 0.5 * cur.devices)); g.addColorStop(1, rgba(AMBER, 0));
+      ctx.fillStyle = g; ctx.fillRect(dx - fh * 0.3, dy - fh * 0.3, fh * 0.6, fh * 0.6);
+      ctx.fillStyle = rgba([255, 236, 200], 0.95 * cur.devices);
+      ctx.fillRect(dx - fh * 0.03, dy - fh * 0.05, fh * 0.06, fh * 0.1);
+    }
+    return head;
   }
 
   function draw() {
@@ -528,7 +580,29 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
       }
       // The clock on the wall: calm, then slow and stale
       const tone = mix([155, 146, 230], RUST, cur.ick);
-      drawDial(sx(0.3), sy(0.25), Math.min(S.w, S.h) * 0.1, tone, (0.55 + 0.35 * cur.ick) * wa, 1.5 + cur.ick, hand);
+      const mAng = lerp(hand, -Math.PI / 2 + Math.PI * 2 * Math.round((hand + Math.PI / 2) / (Math.PI * 2)), cur.fix);
+      const hAng = lerp(hand / 12 - Math.PI / 3, -Math.PI / 2 + Math.PI * 2 * 5 / 12, cur.fix);
+      drawDial(sx(0.3), sy(0.25), Math.min(S.w, S.h) * 0.1, tone, (0.55 + 0.35 * cur.ick) * wa, 1.5 + cur.ick, mAng, hAng);
+      // The announcement: a memo pinned beside the door
+      if (cur.notice > 0.02) {
+        const nx = sx(0.56), ny = sy(0.4), nw = S.w * 0.08, nh = S.h * 0.1;
+        ctx.save(); ctx.translate(nx + nw / 2, ny + nh / 2); ctx.rotate(-0.06);
+        ctx.fillStyle = rgba([240, 236, 226], 0.92 * cur.notice * wa); ctx.fillRect(-nw / 2, -nh / 2, nw, nh);
+        ctx.strokeStyle = rgba([120, 116, 140], 0.8 * cur.notice * wa); ctx.lineWidth = 1.2;
+        for (let k = 0; k < 4; k++) { ctx.beginPath(); ctx.moveTo(-nw * 0.35, -nh * 0.25 + k * nh * 0.17); ctx.lineTo(nw * (k === 3 ? 0.05 : 0.35), -nh * 0.25 + k * nh * 0.17); ctx.stroke(); }
+        ctx.fillStyle = rgba(RUST, 0.9 * cur.notice * wa); ctx.beginPath(); ctx.arc(0, -nh * 0.42, Math.max(2, nw * 0.06), 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+      // Lamplight: the comfort of the familiar
+      if (cur.cozy > 0.02) {
+        const g = ctx.createRadialGradient(sx(0.5), sy(0.62), 0, sx(0.5), sy(0.62), S.w * 0.45);
+        g.addColorStop(0, rgba([255, 196, 120], 0.22 * cur.cozy * wa)); g.addColorStop(1, rgba([255, 196, 120], 0));
+        ctx.fillStyle = g; ctx.fillRect(S.x, S.y, S.w, S.h);
+        ctx.strokeStyle = rgba([235, 220, 200], 0.5 * cur.cozy * wa); ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(sx(0.5), sy(0)); ctx.lineTo(sx(0.5), sy(0.4)); ctx.stroke();
+        ctx.fillStyle = rgba([255, 214, 150], 0.8 * cur.cozy * wa);
+        ctx.beginPath(); ctx.moveTo(sx(0.46), sy(0.44)); ctx.lineTo(sx(0.54), sy(0.44)); ctx.lineTo(sx(0.52), sy(0.4)); ctx.lineTo(sx(0.48), sy(0.4)); ctx.closePath(); ctx.fill();
+      }
     }
 
     // The people still inside.
