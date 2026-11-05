@@ -337,6 +337,9 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
   const outsideScale = (y) => lerp(0.42, 0.62 + Math.max(0, (y - 0.86) / 0.07) * 0.1, cur.reveal);
 
   let clock = 0, hand = -Math.PI / 2;
+  const FADE_OUT = 0.5, FADE_IN = 0.9;
+  const fade = { target: null, t: 0, cut: false };
+  const fadeAlpha = () => !fade.target ? 0 : fade.t < FADE_OUT ? fade.t / FADE_OUT : Math.max(0, 1 - (fade.t - FADE_OUT) / FADE_IN);
   function cutTo(name) {
     Object.assign(cur, SCENES[name]);
     for (const p of people) {
@@ -349,18 +352,24 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
   function step(dt) {
     clock += dt; sceneTime += dt;
     if (scene !== lastScene) {
-      // The opening is a flash-forward. Moving into or out of it is a cut, not a walk.
-      if (scene === "five" || lastScene === "five") cutTo(scene);
+      // The opening is a flash-forward. Moving into or out of it fades through dark: a cut, not a walk.
+      if (scene === "five" || lastScene === "five") { fade.target = scene; fade.t = 0; }
       lastScene = scene; sceneTime = 0;
+    }
+    if (fade.target) {
+      fade.t += dt;
+      if (fade.t >= FADE_OUT && !fade.cut) { cutTo(fade.target); fade.cut = true; sceneTime = 0; }
+      if (fade.t >= FADE_OUT + FADE_IN) { fade.target = null; fade.cut = false; }
     }
     const k = Math.min(1, dt * 1.1);
     const tgt = SCENES[scene];
-    for (const key in tgt) cur[key] += (tgt[key] - cur[key]) * k;
+    if (!(fade.target && !fade.cut)) for (const key in tgt) cur[key] += (tgt[key] - cur[key]) * k;
     hand += dt * 0.35 * (1 - 0.8 * cur.ick) * (reduce ? 0.3 : 1);
     const speed = (reduce ? 0.06 : 0.12);
     const outFeetRow = (row) => lerp(0.78, 0.86 + row * 0.07, cur.reveal);
 
     for (const p of people) {
+      if (fade.target && !fade.cut) continue;
       const out = wantsOut(p);
       p.gold += ((out || p.rank < SCENES[scene].adopt ? 1 : 0) - p.gold) * Math.min(1, dt * 1.5);
       let tx, ty;
@@ -488,16 +497,23 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
     }
     // Down the hall: another door, and someone looking out
     if (cur.next > 0.02) {
-      const bx0 = 0.82, bx1 = 0.99, by0 = horizon - 0.2, by1 = horizon + 0.05;
+      const bx0 = 0.72, bx1 = 0.86, by0 = horizon - 0.2, by1 = horizon - 0.025;
       ctx.fillStyle = rgba([58, 56, 84], 0.95 * cur.next);
       ctx.fillRect(sx(bx0), sy(by0), (bx1 - bx0) * S.w, (by1 - by0) * S.h);
-      const dOpen = Math.min(1, Math.max(0, (sceneTime - 3) / 3)) * cur.next;
-      const dx0 = 0.88, dx1 = 0.93, dy0 = by1 - 0.12;
+      const dOpen = Math.min(1, Math.max(0, (sceneTime - 1.2) / 2)) * cur.next;
+      const dx0 = 0.765, dx1 = 0.815, dy0 = by1 - 0.11;
+      // A warm glow so the eye finds the open door
+      if (dOpen > 0.05) {
+        const gx = sx((dx0 + dx1) / 2), gy = sy(dy0 + 0.05);
+        const gg = ctx.createRadialGradient(gx, gy, 0, gx, gy, S.w * 0.09);
+        gg.addColorStop(0, rgba([255, 226, 170], 0.55 * dOpen * (0.85 + 0.15 * Math.sin(clock * 2)))); gg.addColorStop(1, rgba([255, 226, 170], 0));
+        ctx.fillStyle = gg; ctx.fillRect(gx - S.w * 0.09, gy - S.w * 0.09, S.w * 0.18, S.w * 0.18);
+      }
       ctx.fillStyle = rgba([255, 226, 170], 0.85 * dOpen);
       ctx.fillRect(sx(dx0), sy(dy0), (dx1 - dx0) * S.w * dOpen, (by1 - dy0) * S.h);
       ctx.fillStyle = rgba([40, 38, 62], 0.95 * cur.next);
       ctx.fillRect(sx(dx0 + (dx1 - dx0) * dOpen), sy(dy0), (dx1 - dx0) * (1 - dOpen) * S.w, (by1 - dy0) * S.h);
-      if (dOpen > 0.5) drawFigure(sx(dx0 + 0.012), sy(by1), S.h * 0.085, { walk: 0, phase: 0, face: -1, slump: 0, lean: 0.6, color: LAV, alpha: (dOpen - 0.5) * 2 * 0.9, seed: 3 });
+      if (dOpen > 0.4) drawFigure(sx(dx0 + 0.02), sy(by1 - 0.004), S.h * 0.085, { walk: 0, phase: 0, face: -1, slump: 0, lean: 0.8, color: [52, 50, 86], alpha: Math.min(1, (dOpen - 0.4) * 2), seed: 3 });
     }
     // Other people, already out here
     for (const s of STRANGERS) {
@@ -629,6 +645,8 @@ footer { position: relative; z-index: 1; padding: 2rem max(16px, 6vw) 3rem; colo
         ctx.beginPath(); ctx.arc(h.x, h.y, S.h * 0.04 + Math.sin(clock * 2) * 2, 0, Math.PI * 2); ctx.stroke();
       }
     }
+    const fa = fadeAlpha();
+    if (fa > 0) { ctx.fillStyle = `rgba(12,14,28,${fa})`; ctx.fillRect(S.x, S.y, S.w, S.h); }
     ctx.restore();
     // Frame
     ctx.strokeStyle = "rgba(155,146,230,0.28)"; ctx.lineWidth = 1;
